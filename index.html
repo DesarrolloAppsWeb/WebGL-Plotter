@@ -4,13 +4,23 @@
 		<meta charset=utf-8>
 		<title>3D Plotter</title>
 		<style>
-			body { margin: 0; }
+			body { 
+				margin: 0; 		
+				padding: 0;		
+			}
 			canvas { 
 				border-style: solid;
 				border-width: 2px;
 				 }
-			.equationInput{
-				padding: 10px;
+			.form-inline{
+				padding: 5px;
+			}
+			#container{
+				width: 70%;
+				height: 100vh;
+				padding: 0;
+				margin-left: auto;
+				margin-right: auto;
 			}
 		</style>
 		<script src="parser.js"></script>
@@ -18,60 +28,65 @@
 	</head>
 	<body>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>
-		<div class="equationInput">
-			
-			<label> <em>Z</em> = &nbsp;</label><input id="mathFuncInput" type="text" placeholder="Sin(x) + Cos(y)">
-			<button onclick="evaluateInput();" > Ok! </button>
+		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+		
+		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-7s5uDGW3AHqw6xtJmNNtr+OBRJUlgkNJEo78P4b0yRw= sha512-nNo+yCHEyn0smMxSswnf/OnX6/KwJuZTlNZBjauKhTK0c+zT+q5JOCx0UFhXQ6rJR9jg6Es8gPuD2uZcYDLqSw==" crossorigin="anonymous">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha256-KXn5puMvxCw+dAYznun+drMdG1IFl3agK0p/pqT9KAo= sha512-2e8qq0ETcfWRI4HJBzQiA3UoyFk6tbNyG+qSaIBZLyW9Xf3sWZHN/lxe9fTh1U45DpPf07yj94KsUHHWe4Yk1A==" crossorigin="anonymous"></script>
+		<div id="container" align="center">
+		<h1>WebGL Plotter</h1>
+		<div class="form-inline">
+			<label for="mathFuncInput" ><em>Z</em> = &nbsp;</label>
+			<input  class="form-control" id="mathFuncInput" type="text" placeholder="Sin(x) + Cos(y)">
+			<button class="btn" onclick="evaluateInput();" > Plot </button>
 		</div>
 		<script>
 			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera( 45, 1, 0.1, 1000 );
+			var camera = new THREE.PerspectiveCamera( 45, 1, 0.1, 500 );
 			camera.position.y = 50;
 			camera.position.x = 0;
 			camera.position.z = 40;
 			camera.rotation.x = -45* ( Math.PI / 180);  
 			scene.add(camera)
-
 			var renderer = new THREE.WebGLRenderer();
 			renderer.setSize( 800, 450);
 			renderer.setClearColor(0xffffff, 1); 
-			document.body.appendChild( renderer.domElement );
+			container.appendChild( renderer.domElement );
 
-			var planeMaterial = new THREE.MeshLambertMaterial({
-			      color: 0xffffff,
-			      wireframe: true,
+			var material = new THREE.MeshBasicMaterial({
+			    color:0xaaaaaa,
+			    side:THREE.DoubleSide
 			});
 
+			var planeMaterial = new THREE.MeshLambertMaterial({
+			      color: 0xaaccee,
+			      side:THREE.DoubleSide,
+			      //wireframe: true,
+			});
 			var pointLight = new THREE.PointLight(0xFFFFFF);
-
 			// set its position
 			pointLight.position.x = 0;
 			pointLight.position.y = 0;
-			pointLight.position.z = 150;
-
+			pointLight.position.z = 0;
 			scene.add(pointLight);
-
 			var planeGeometry = new THREE.PlaneGeometry(40,40,30,30);
 			planeGeometry.dynamic = true;
 			planeGeometry.rotateX(90 * (Math.PI / 180));
 			var planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
-
 			for (var i = planeGeometry.vertices.length - 1; i >= 0; i--) {
 				var x = planeGeometry.vertices[i].x;
 				var z = planeGeometry.vertices[i].z;
 				var y = Math.sin(x) + Math.cos(z);
 				planeGeometry.vertices[i].setY(y);
 			};
-
 			scene.add(planeMesh);
-
 			function render() {
 				requestAnimationFrame( render );
 				planeGeometry.rotateY(0.5/180);
+				window.addEventListener("mousewheel", wheelHandle, false);
+				window.addEventListener("DOMMouseScroll", wheelHandle, false);
 				renderer.render( scene, camera );
 			}
 			render();
-
 			function evaluateInput(){
 				var mathExpression = mathFuncInput.value;
 				//var parsedExpression = Parser.parse(mathExpression);
@@ -85,6 +100,21 @@
 				};
 				planeGeometry.verticesNeedUpdate = true;
 			}
+
+			
+
+			function wheelHandle(e){
+				var e = window.event || e; // old IE support
+				var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+				var currentScale = planeMesh.scale;
+				currentScale.x += (delta * 0.05);
+				currentScale.y += (delta * 0.05);
+				currentScale.z += (delta * 0.05);
+				planeMesh.scale = currentScale;
+				//window.alert(delta);
+			}
 		</script>
+
+		</div>
 	</body>
 </html>
