@@ -39,6 +39,7 @@
 			<input  class="form-control" id="mathFuncInput" type="text" placeholder="Sin(x) + Cos(y)">
 			<button class="btn" onclick="evaluateInput();" > Plot </button>
 		</div>
+		<label for="YscaleInput">Z Scale:</label><input type="range" value="50"></input>
 		<script>
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera( 45, 1, 0.1, 500 );
