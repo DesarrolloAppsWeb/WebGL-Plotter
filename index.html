@@ -22,6 +22,9 @@
 				margin-left: auto;
 				margin-right: auto;
 			}
+			#zScale{
+				width: 350px;
+			}
 		</style>
 		<script src="parser.js"></script>
 		<script src="math.min.js"></script>
@@ -32,12 +35,14 @@
 		
 		<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-7s5uDGW3AHqw6xtJmNNtr+OBRJUlgkNJEo78P4b0yRw= sha512-nNo+yCHEyn0smMxSswnf/OnX6/KwJuZTlNZBjauKhTK0c+zT+q5JOCx0UFhXQ6rJR9jg6Es8gPuD2uZcYDLqSw==" crossorigin="anonymous">
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha256-KXn5puMvxCw+dAYznun+drMdG1IFl3agK0p/pqT9KAo= sha512-2e8qq0ETcfWRI4HJBzQiA3UoyFk6tbNyG+qSaIBZLyW9Xf3sWZHN/lxe9fTh1U45DpPf07yj94KsUHHWe4Yk1A==" crossorigin="anonymous"></script>
+		
 		<div id="container" align="center">
 		<h1>WebGL Plotter</h1>
 		<div class="form-inline">
 			<label for="mathFuncInput" ><em>Z</em> = &nbsp;</label>
 			<input  class="form-control" id="mathFuncInput" type="text" placeholder="Sin(x) + Cos(y)">
-			<button class="btn" onclick="evaluateInput();" > Plot </button>
+			<button class="btn" onclick="evaluateInput();" > Plot </button><br>
+			<label for="zScale">Z Scale </label><input class="form-control" id="zScale" type="range" value="50" width="350" onchange="scaleZ()">
 		</div>
 		<label for="YscaleInput">Z Scale:</label><input type="range" value="50"></input>
 		<script>
@@ -61,7 +66,7 @@
 			var planeMaterial = new THREE.MeshLambertMaterial({
 			      color: 0xaaccee,
 			      side:THREE.DoubleSide,
-			      //wireframe: true,
+			      wireframe: true,
 			});
 			var pointLight = new THREE.PointLight(0xFFFFFF);
 			// set its position
@@ -108,11 +113,18 @@
 				var e = window.event || e; // old IE support
 				var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 				var currentScale = planeMesh.scale;
-				currentScale.x += (delta * 0.05);
-				currentScale.y += (delta * 0.05);
-				currentScale.z += (delta * 0.05);
+				currentScale.x += Math.round(delta * 0.05);
+				currentScale.y += Math.round(delta * 0.05);
+				currentScale.z += Math.round(delta * 0.05);
 				planeMesh.scale = currentScale;
 				//window.alert(delta);
+			}
+
+			function scaleZ(){
+				var value = document.getElementById("zScale");
+				value = value.value;
+				var Scale = (value/100) * 2;
+				planeMesh.scale.y = Scale;
 			}
 		</script>
 
